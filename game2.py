@@ -7,6 +7,7 @@ class RobotGame:
     def __init__(self, width, height, obstacle_percent, start, goal):
         self.width = width
         self.height = height
+        self.max_step = width+height-2
         self.obstacle_percent = obstacle_percent
         self.start = start
         self.goal = goal
@@ -30,11 +31,13 @@ class RobotGame:
         self.arrow_right = pygame.transform.scale(self.arrow_right, (int(30 * self.arrow_scale), int(30 * self.arrow_scale)))
     
         self.field = self.generate_random_field()
+        self.significances = np.zeros((self.height, self.width), dtype=np.float64)
         self.robot_x, self.robot_y = start
         self.running = True
 
         self.moves_count = 0
         self.episode = 1
+        self.status = None
         self.moves = [(0, 0)]
 
         self.robot_direction = self.arrow_up  # Initial direction
@@ -102,8 +105,29 @@ class RobotGame:
         self.robot_x, self.robot_y = self.start
         self.moves_count = 0
         self.moves = [(0, 0)]
+        self.status = None
         
 
+    def update_significances(self):
+        max_point = 100
+        min_point = -100
+        self.significances[self.height-1][self.width-1] = 100 #финиш имеет 100 очков важности
+        if self.status: #если дошел до финиша
+            pass
+        else: #если не дошел до финиша
+            coef = min_point / self.max_step #100/18=5.55
+            obstacle_y, obstacle_x = self.moves[-1]
+            self.significances[obstacle_x][obstacle_y] = min_point
+            for i in range(self.height):
+                for j in range(self.width):
+                    if (i == 0 and j == 0) or (i==self.width-1 and j==self.height-1) :
+                        continue 
+                    else:
+                        num_steps = abs(obstacle_y-j)+abs(obstacle_x-i)
+                        self.significances[i][j] += num_steps * coef
+
+
+        return self.significances
     def move_robot(self):
         random_move = random.choice(self.get_possible_moves())
         new_x = self.robot_x + random_move[0]
@@ -125,7 +149,7 @@ class RobotGame:
         return (new_x, new_y)
     
     def info(self):
-        return f'Ep.{self.episode}. {self.moves_count} moves. \n{self.moves}'
+        return f'Ep.{self.episode}. {self.moves_count} moves. \n{self.moves}\n{self.significances}'
 
     def run_game(self):
         while self.running:
@@ -141,12 +165,16 @@ class RobotGame:
 
             if (self.robot_x, self.robot_y) == self.goal:
                 # self.running = False
+                self.status = True
+                self.update_significances()
                 print(self.info())
                 self.reset()
 
             # Добавьте проверку на столкновение с препятствием
             if self.field[self.robot_y, self.robot_x]:
                 # self.running = False
+                self.status = False
+                self.significances = self.update_significances()
                 print(self.info())
                 self.reset()
 
@@ -157,7 +185,7 @@ class RobotGame:
 
 if __name__ == "__main__":
     width, height = 10, 10
-    obstacle_percent = 10  # Процент заполнения препятствиями
+    obstacle_percent = 4  # Процент заполнения препятствиями
     start = (0, 0)
     goal = (width-1, height-1)
 
