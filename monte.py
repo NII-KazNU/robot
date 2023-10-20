@@ -2,7 +2,6 @@ import pygame
 from pygame.locals import *
 import random
 import numpy as np
-
 class RobotGame:
     def __init__(self, width, height, obstacle_percent, start, goal, random_state, delay):
         self.width = width
@@ -13,20 +12,19 @@ class RobotGame:
         self.goal = goal
         self.delay = delay
         pygame.init()
-        self.screen_width = 700  # Фиксированный размер окна
-        self.cell_size = self.screen_width // max(width, height)  # Динамический размер ячейки
+        self.screen_width = 700 
+        self.cell_size = self.screen_width // max(width, height)  
         self.screen_height = self.cell_size * max(width, height)
         self.screen = pygame.display.set_mode((self.screen_width, self.screen_height))
         pygame.display.set_caption("Robot Game")
 
         self.current_scenario_info = ""
 
-        # Динамический размер стрелок
-        self.arrow_scale = self.cell_size / 30.0  # Стандартный размер стрелок - 30 пикселей
-        self.arrow_up = pygame.image.load("arrow_up.png")  # Replace with your arrow image file
-        self.arrow_down = pygame.image.load("arrow_down.png")  # Replace with your arrow image file
-        self.arrow_left = pygame.image.load("arrow_left.png")  # Replace with your arrow image file
-        self.arrow_right = pygame.image.load("arrow_right.png")  # Replace with your arrow image file
+        self.arrow_scale = self.cell_size / 30.0  
+        self.arrow_up = pygame.image.load("arrow_up.png")  
+        self.arrow_down = pygame.image.load("arrow_down.png")  
+        self.arrow_left = pygame.image.load("arrow_left.png")  
+        self.arrow_right = pygame.image.load("arrow_right.png")  
         self.arrow_up = pygame.transform.scale(self.arrow_up, (int(30 * self.arrow_scale), int(30 * self.arrow_scale)))
         self.arrow_down = pygame.transform.scale(self.arrow_down, (int(30 * self.arrow_scale), int(30 * self.arrow_scale)))
         self.arrow_left = pygame.transform.scale(self.arrow_left, (int(30 * self.arrow_scale), int(30 * self.arrow_scale)))
@@ -294,7 +292,7 @@ class RobotGame:
         pygame.quit()
 
 if __name__ == "__main__":
-    width, height = 10, 10
+    width, height = 15,15 
     obstacle_percent = 0.2  # Процент заполнения препятствиями
     start = (0, 0)
     goal = (width-1, height-1)
